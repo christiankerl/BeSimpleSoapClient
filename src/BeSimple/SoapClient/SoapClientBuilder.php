@@ -41,6 +41,7 @@ class SoapClientBuilder extends SoapBaseBuilder
     }
     
     private $optionAuthentication;
+    private $optionEndpointLocation;
     
     /**
      * Initializes all options with the defaults used in the ext/soap SoapClient.
@@ -54,6 +55,7 @@ class SoapClientBuilder extends SoapBaseBuilder
         $this->options['trace']       = false;
         
         $this->optionAuthentication = array();
+        $this->optionEndpointLocation = null;
     }
     
     public function build()
@@ -63,6 +65,11 @@ class SoapClientBuilder extends SoapBaseBuilder
         $this->options = array_merge($this->options, $this->optionAuthentication);
         
         $client = new \SoapClient($this->optionWsdl, $this->options);
+        
+        if(null !== $this->optionEndpointLocation)
+        {
+        	$client->__setLocation($this->optionEndpointLocation);
+        }
         
         return $client;
     }
@@ -75,6 +82,13 @@ class SoapClientBuilder extends SoapBaseBuilder
         }
     }
 
+    public function withEndpointLocation($location)
+    {
+    	$this->optionEndpointLocation = $location;
+    	
+    	return $this;
+    }
+    
     public function withProxyServer($host, $port, $username, $password)
     { 
         $this->options['proxy_host']     = $host;
@@ -83,6 +97,13 @@ class SoapClientBuilder extends SoapBaseBuilder
         $this->options['proxy_password'] = $password;
         
         return $this; 
+    }
+    
+    public function withHttpSession()
+    {
+    	// TODO: this should enable sending the session cookie received from the server with every http request
+    	
+        return $this;
     }
     
     public function withHttpCompression()
